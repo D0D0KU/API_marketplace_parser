@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import DataSerializer
-from .parsers.wb import parse_products
+from .parsers import wb, yandex_market
 
 
 class ParseDataView(APIView):
@@ -14,9 +14,11 @@ class ParseDataView(APIView):
             data_to_parse = serializer.validated_data['data_to_parse']
             
             # Здесь выполните парсинг данных и получите спаршенные данные
-            parsed_data = parse_products(data_to_parse)
+            parsed_data = {}
+            parsed_data['wb'] = wb.parse_products(data_to_parse, parse_page=1)
+            parsed_data['yandex_market'] = yandex_market.parse_products(data_to_parse, parse_page=1)
             
-            # Верните спаршенные данные в ответе API
+            # Возвращаем спаршенные данные в ответе API
             return Response({'parsed_data': parsed_data})
         return Response(serializer.errors, status=400)
 
